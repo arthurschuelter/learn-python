@@ -10,6 +10,12 @@ pip install -e .
 
 ## Usage
 
+
+Start ollama:
+```bash
+ollama serve
+```
+
 Start the chatbot:
 ```bash
 start-chat
