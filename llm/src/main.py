@@ -55,38 +55,18 @@ def main():
         print("Failed to load or create the vector database.")
         return
 
-    test_query = "Please summarize the sales"
-    print("You: ", test_query)
-    # user_input = input("You: ")
-    user_input = test_query
-    if user_input:
-        try:
-            response = chain.invoke(input=user_input)
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            print("Exiting. Goodbye!")
+            break
+        if user_input:
+            try:
+                response = chain.invoke(input=user_input)
 
-            print("Chat:", response)
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-    else:
-        print("Please enter a question to get started.")
-
-# def main():
-#     print("Llama LLM Chat - Type 'exit' to quit.")
-
-#     chat = LlamaChat()
-#     messages = []
-
-#     while True:
-#         user_input = input("\nYou: ")
-
-#         if user_input.lower() in ["exit", "quit"]:
-#             print("\nExiting. Goodbye!")
-#             break
-
-#         messages.append({"role": "user", "content": user_input})
-#         response = chat.get_response(messages)
-#         messages.append({"role": "assistant", "content": response})
-        
-#         print(f"Llama: {response}")
+                print("Chat:", response)
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
     
 if __name__ == "__main__":
   main()

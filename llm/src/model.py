@@ -19,7 +19,7 @@ from .config import (
 
 class LlamaModel:
     def __init__(self, model_name=OLLAMA_MODEL):
-        print("Initializing LlamaModel:", model_name)
+        # print("Initializing LlamaModel:", model_name)
         self.model = ChatOllama(model=model_name)
         ollama.pull(EMBEDDING_MODEL)
         self.embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL)

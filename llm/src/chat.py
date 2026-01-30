@@ -13,7 +13,7 @@ from .config import (
 
 class LlamaChat:
   def __init__(self):
-    print("Initializing LlamaChat with model:", OLLAMA_MODEL)
+    # print("Initializing LlamaChat with model:", OLLAMA_MODEL)
     llama_model = LlamaModel(OLLAMA_MODEL)
     self.model = llama_model.model
     self.vector_db = llama_model.load_vector_db()
