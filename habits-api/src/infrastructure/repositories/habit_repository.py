@@ -32,19 +32,42 @@ class HabitRepository(HabitRepositoryInterface):
 
     async def get_by_user_id(self, user_id: UUID) -> List[Habit]:
         from sqlalchemy import text
+        from domain.entities.habit_entry import HabitEntry
+
+        # Fetch habits
         query = text("SELECT id, name, description, user_id, created_at, updated_at FROM habits WHERE user_id = :user_id")
         result = self.db_session.execute(query, {"user_id": str(user_id)})
         rows = result.fetchall()
 
-        # Convert rows to Habit domain entities
+        # Convert rows to Habit domain entities with their entries
         habits = []
         for row in rows:
+            habit_id = row[0]
+
+            # Fetch habit entries for this habit
+            entries_query = text("SELECT id, habit_id, entry_date, created_at, updated_at FROM habit_entries WHERE habit_id = :habit_id ORDER BY entry_date DESC")
+            entries_result = self.db_session.execute(entries_query, {"habit_id": str(habit_id)})
+            entries_rows = entries_result.fetchall()
+
+            # Convert entry rows to HabitEntry domain entities
+            entries = []
+            for entry_row in entries_rows:
+                entry = HabitEntry(
+                    habit_id=entry_row[1],
+                    entry_date=entry_row[2],
+                    created_at=entry_row[3],
+                    updated_at=entry_row[4]
+                )
+                entries.append(entry)
+
             habit = Habit(
+                id=row[0],
                 name=row[1],
                 description=row[2],
                 user_id=row[3],
                 created_at=row[4],
-                updated_at=row[5]
+                updated_at=row[5],
+                entries=entries
             )
             habits.append(habit)
         return habits

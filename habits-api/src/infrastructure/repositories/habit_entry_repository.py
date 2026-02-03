@@ -25,7 +25,7 @@ class HabitEntryRepository(HabitEntryRepositoryInterface):
         except Exception as e:
             print(f"Error creating habit entry: {e}")
             self.db_session.rollback()
-            raise
+            # raise
 
     # async def get_by_id(self, habit_id: int) -> Optional[Habit]:
     #     return self.db_session.query(Habit).filter(Habit.id == habit_id).first()
