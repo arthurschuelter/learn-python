@@ -4,6 +4,7 @@ from application.interfaces.habit_entry_repository_interface import HabitEntryRe
 from domain.entities.habit_entry import HabitEntry
 from infrastructure.database.connection import get_db
 import datetime
+from libs.utils.timing import measure_time
 
 class HabitEntryRepository(HabitEntryRepositoryInterface):
     def __init__(self, db_session):
@@ -29,7 +30,7 @@ class HabitEntryRepository(HabitEntryRepositoryInterface):
 
     # async def get_by_id(self, habit_id: int) -> Optional[Habit]:
     #     return self.db_session.query(Habit).filter(Habit.id == habit_id).first()
-
+    @measure_time
     async def get_by_habit_id(self, habit_id: UUID) -> List[HabitEntry]:
         from sqlalchemy import text
         query = text("SELECT id, habit_id, entry_date, created_at, updated_at FROM habit_entries WHERE habit_id = :habit_id")
