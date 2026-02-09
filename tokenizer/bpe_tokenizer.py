@@ -17,7 +17,7 @@ class BPETokenizer:
                 processed_text.append("Ġ")
             if char != " ":
                 processed_text.append(char)
-        processed_text = "".join(sorted(set(processed_text)))
+        processed_text = "".join(processed_text)
 
         unique_chars = [chr(i) for i in range(256)]
         unique_chars.extend(
@@ -36,23 +36,21 @@ class BPETokenizer:
                     new_id = len(self.vocab)
                     self.vocab[new_id] = token
                     self.inverse_vocab[token] = new_id
-        
         token_ids = [self.inverse_vocab[char] for char in processed_text]
 
         for new_id in range(len(self.vocab), vocab_size):
-                pair_id = self.find_freq_pair(token_ids, mode="most")
-
-                if pair_id is None:
-                    break
-                
-                token_ids = self.replace_pair(token_ids, pair_id, new_id)
-                self.bpe_merges[pair_id] = new_id
+            pair_id = self.find_freq_pair(token_ids, mode="most")
+            if pair_id is None:
+                break
+            token_ids = self.replace_pair(token_ids, pair_id, new_id)
+            self.bpe_merges[pair_id] = new_id
 
         # Build the vocabulary with merged tokens
         for (p0, p1), new_id in self.bpe_merges.items():
             merged_token = self.vocab[p0] + self.vocab[p1]
             self.vocab[new_id] = merged_token
             self.inverse_vocab[merged_token] = new_id
+
 
     def encode(self, text, allowed_special={"<|endoftext|>"}):
         import re
@@ -164,6 +162,22 @@ class BPETokenizer:
         # Finally, convert merged symbols back to IDs
         merged_ids = [self.inverse_vocab[sym] for sym in symbols]
         return merged_ids
+
+    def decode(self, token_ids):
+        decoded_string = ""
+        for i, token_id in enumerate(token_ids):
+            if token_id not in self.vocab:
+                raise ValueError(f"Token ID {token_id} not found in vocab.")
+            token = self.vocab[token_id]
+            if token == "\n":
+                if decoded_string and not decoded_string.endswith(" "):
+                    decoded_string += " "  # Add space if not present before a newline
+                decoded_string += token
+            elif token.startswith("Ġ"):
+                decoded_string += " " + token[1:]
+            else:
+                decoded_string += token
+        return decoded_string
 
 
     def find_freq_pair(self, token_ids, mode="most"):
