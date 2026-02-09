@@ -2,8 +2,11 @@ from typing import List, Optional
 from uuid import UUID
 from application.interfaces.habit_repository_interface import HabitRepositoryInterface
 from domain.entities.habit import Habit
+from domain.entities.habit_entry import HabitEntry
 from infrastructure.database.connection import get_db
 import datetime
+
+from sqlalchemy import text
 
 class HabitRepository(HabitRepositoryInterface):
     def __init__(self, db_session):
@@ -11,7 +14,6 @@ class HabitRepository(HabitRepositoryInterface):
 
     def create(self, habit: Habit):
         print("Creating habit in the database")
-        from sqlalchemy import text
         try:
             query = text("INSERT INTO habits (name, description, user_id, created_at) VALUES (:name, :description, :user_id, :created_at) RETURNING id")
             result = self.db_session.execute(
@@ -31,8 +33,6 @@ class HabitRepository(HabitRepositoryInterface):
     #     return self.db_session.query(Habit).filter(Habit.id == habit_id).first()
 
     async def get_by_user_id(self, user_id: UUID) -> List[Habit]:
-        from sqlalchemy import text
-        from domain.entities.habit_entry import HabitEntry
 
         # Fetch habits
         query = text("SELECT id, name, description, user_id, created_at, updated_at FROM habits WHERE user_id = :user_id")
@@ -45,7 +45,7 @@ class HabitRepository(HabitRepositoryInterface):
             habit_id = row[0]
 
             # Fetch habit entries for this habit
-            entries_query = text("SELECT id, habit_id, entry_date, created_at, updated_at FROM habit_entries WHERE habit_id = :habit_id ORDER BY entry_date DESC")
+            entries_query = text("SELECT id, habit_id, entry_date, duration, created_at, updated_at FROM habit_entries WHERE habit_id = :habit_id ORDER BY entry_date DESC")
             entries_result = self.db_session.execute(entries_query, {"habit_id": str(habit_id)})
             entries_rows = entries_result.fetchall()
 
@@ -55,8 +55,9 @@ class HabitRepository(HabitRepositoryInterface):
                 entry = HabitEntry(
                     habit_id=entry_row[1],
                     entry_date=entry_row[2],
-                    created_at=entry_row[3],
-                    updated_at=entry_row[4]
+                    duration=entry_row[3],
+                    created_at=entry_row[4],
+                    updated_at=entry_row[5]
                 )
                 entries.append(entry)
 

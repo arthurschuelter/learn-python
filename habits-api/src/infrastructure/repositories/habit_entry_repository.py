@@ -5,6 +5,7 @@ from domain.entities.habit_entry import HabitEntry
 from infrastructure.database.connection import get_db
 import datetime
 from libs.utils.timing import measure_time
+from sqlalchemy import text
 
 class HabitEntryRepository(HabitEntryRepositoryInterface):
     def __init__(self, db_session):
@@ -12,12 +13,11 @@ class HabitEntryRepository(HabitEntryRepositoryInterface):
 
     def create(self, habit_entry: HabitEntry):
         print("Creating habit entry in the database")
-        from sqlalchemy import text
         try:
-            query = text("INSERT INTO habit_entries (habit_id, entry_date, created_at) VALUES (:habit_id, :entry_date, :created_at) RETURNING id")
+            query = text("INSERT INTO habit_entries (habit_id, entry_date, duration, created_at) VALUES (:habit_id, :entry_date, :duration, :created_at) RETURNING id")
             result = self.db_session.execute(
                 query,
-                {"habit_id": habit_entry.habit_id, "entry_date": habit_entry.entry_date, "created_at": datetime.datetime.now()}
+                {"habit_id": habit_entry.habit_id, "entry_date": habit_entry.entry_date, "duration": habit_entry.duration, "created_at": datetime.datetime.now()}
             )
             self.db_session.commit()
             habit_entry_id = result.fetchone()[0]
@@ -32,7 +32,6 @@ class HabitEntryRepository(HabitEntryRepositoryInterface):
     #     return self.db_session.query(Habit).filter(Habit.id == habit_id).first()
     @measure_time
     async def get_by_habit_id(self, habit_id: UUID) -> List[HabitEntry]:
-        from sqlalchemy import text
         query = text("SELECT id, habit_id, entry_date, created_at, updated_at FROM habit_entries WHERE habit_id = :habit_id")
         result = self.db_session.execute(query, {"habit_id": str(habit_id)})
         rows = result.fetchall()
