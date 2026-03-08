@@ -9,12 +9,13 @@ def create_retriever(vector_db, llm):
     """Create a multi-query retriever."""
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
-        template="""You are an AI language model assistant. Your task is to generate five
-different versions of the given user question to retrieve relevant documents from
-a vector database. By generating multiple perspectives on the user question, your
-goal is to help the user overcome some of the limitations of the distance-based
-similarity search. Provide these alternative questions separated by newlines.
-Original question: {question}""",
+        template="""
+            You are an AI language model assistant. Your task is to generate five
+            different versions of the given user question to retrieve relevant documents from
+            a vector database. By generating multiple perspectives on the user question, your
+            goal is to help the user overcome some of the limitations of the distance-based
+            similarity search. Provide these alternative questions separated by newlines.
+            Original question: {question}""",
     )
 
     retriever = MultiQueryRetriever.from_llm(
@@ -26,10 +27,11 @@ Original question: {question}""",
 def create_chain(retriever, llm):
     """Create the chain with preserved syntax."""
     # RAG prompt
-    template = """Answer the question based ONLY on the following context:
-{context}
-Question: {question}
-"""
+    template = """
+        Answer the question based ONLY on the following context:
+        {context}
+        Question: {question}
+        """
 
     prompt = ChatPromptTemplate.from_template(template)
 
