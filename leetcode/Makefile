@@ -8,6 +8,9 @@ start:
 11: start
 	pytest 11/tests.py -v
 
+33: start
+	pytest 33/tests.py -v
+	
 36: start
 	pytest 36/tests.py -v
 
