@@ -84,7 +84,7 @@ multidict==6.7.1
 mypy_extensions==1.1.0
 narwhals==2.15.0
 networkx==3.6.1
-nltk==3.9.2
+nltk==3.9.3
 numba==0.63.1
 numpy==2.3.5
 oauthlib==3.3.1
